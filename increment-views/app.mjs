@@ -38,7 +38,10 @@ export const lambdaHandler = async (event, context) => {
     try {
         const response = await docClient.send(command);
         console.log(response);
-        return response;
+        return {
+            'statusCode': 200,
+            'body': response
+        }
     } catch (err) {
         console.log(err);
         return err;
