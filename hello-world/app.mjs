@@ -11,12 +11,15 @@
  * 
  */
 
+const tableName = process.env.TABLE_NAME;
+
 export const lambdaHandler = async (event, context) => {
     try {
         return {
             'statusCode': 200,
             'body': JSON.stringify({
                 message: 'hello world',
+                tableName: tableName
             })
         }
     } catch (err) {
