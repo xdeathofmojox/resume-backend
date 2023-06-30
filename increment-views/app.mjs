@@ -40,9 +40,9 @@ export const lambdaHandler = async (event, context) => {
         console.log(response);
         return {
             'statusCode': 200,
-            'body': {
+            'body': JSON.stringify({
                 'views': response['Attributes']['views']
-            }
+            })
         }
     } catch (err) {
         console.log(err);
