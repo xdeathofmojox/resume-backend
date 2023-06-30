@@ -11,17 +11,34 @@
  * 
  */
 
-const tableName = process.env.TABLE_NAME;
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { UpdateCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+
+const client = new DynamoDBClient({ region: process.env.REGION });
+const docClient = DynamoDBDocumentClient.from(client);
+
+const params = {
+    TableName: process.env.TABLE_NAME,
+    Key:{
+        id: 'view_counter'
+    },
+    UpdateExpression: "ADD #views :increase",
+    ExpressionAttributeNames: {
+        "#views": "views"
+    },
+    ExpressionAttributeValues: {
+        ":increase": 1
+    },
+    ReturnValues: "UPDATED_NEW"
+}
+
+const command = new UpdateCommand(params);
 
 export const lambdaHandler = async (event, context) => {
     try {
-        return {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                tableName: tableName
-            })
-        }
+        const response = await docClient.send(command);
+        console.log(response);
+        return response;
     } catch (err) {
         console.log(err);
         return err;
