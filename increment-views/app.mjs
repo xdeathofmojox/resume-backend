@@ -41,7 +41,12 @@ export const lambdaHandler = async (event, context) => {
             'statusCode': 200,
             'body': JSON.stringify({
                 'views': response['Attributes']['views']
-            })
+            }),
+            headers: {
+                "Access-Control-Allow-Headers" : "Content-Type",
+                "Access-Control-Allow-Origin": "https://wbresume.frozen-phoenix.com",
+                "Access-Control-Allow-Methods": "POST"
+            },
         }
     } catch (err) {
         console.log(err);

@@ -9,6 +9,11 @@ Description: >
 Globals:
   Function:
     Timeout: 3
+  Api:
+    Cors:
+      AllowMethods: "'POST'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'https://wbresume.frozen-phoenix.com'"
 
 Parameters:
   Stage:
@@ -26,7 +31,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Stage
-      Cors: "'www.wbresume.frozen-phoenix.com'"
       Domain:
         DomainName: !Sub api-${Stage}.wbresume.frozen-phoenix.com
         CertificateArn: !Ref IncrementViewsApiCertificate
