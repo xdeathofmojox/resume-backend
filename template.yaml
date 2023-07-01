@@ -24,8 +24,14 @@ Resources:
 
   IncrementViewsApiDeployment:
     Type: AWS::Serverless::Api
-      Properties:
-        StageName: !Ref Stage
+    Properties:
+      StageName: !Ref Stage
+      Cors: "'www.wbresume.frozen-phoenix.com'"
+      Domain:
+        DomainName: !Sub api-${Stage}.wbresume.frozen-phoenix.com
+        CertificateArn: !Ref IncrementViewsApiCertificate
+        Route53:
+          HostedZoneName: "frozen-phoenix.com."
 
   IncrementViewsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -42,12 +48,6 @@ Resources:
         Variables:
           TABLE_NAME: !Ref IncrementViewsTable
           REGION: !Sub ${AWS::Region}
-      Cors: "'www.wbresume.frozen-phoenix.com'"
-      Domain:
-        DomainName: !Sub api-${Stage}.wbresume.frozen-phoenix.com
-        CertificateArn: !Ref IncrementViewsApiCertificate
-        Route53:
-          HostedZoneName: "frozen-phoenix.com."
       Events:
         IncrementViews:
           Type: Api
