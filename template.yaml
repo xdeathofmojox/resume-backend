@@ -10,7 +10,23 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
 Resources:
+  IncrementViewsApiCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Sub api-${Stage}.wbresume.frozen-phoenix.com
+      ValidationMethod: DNS
+
+  IncrementViewsApiDeployment:
+    Type: AWS::Serverless::Api
+      Properties:
+        StageName: !Ref Stage
+
   IncrementViewsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -26,24 +42,29 @@ Resources:
         Variables:
           TABLE_NAME: !Ref IncrementViewsTable
           REGION: !Sub ${AWS::Region}
+      Cors: "'www.wbresume.frozen-phoenix.com'"
+      Domain:
+        DomainName: !Sub api-${Stage}.wbresume.frozen-phoenix.com
+        CertificateArn: !Ref IncrementViewsApiCertificate
+        Route53:
+          HostedZoneName: "frozen-phoenix.com."
       Events:
         IncrementViews:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
           Properties:
             Path: /increment
             Method: post
+            RestApiId: !Ref IncrementViewsApiDeployment
+
   IncrementViewsTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
       TableName: !Sub ${AWS::StackName}-IncrementViews
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   IncrementViewsApi:
     Description: "API Gateway endpoint URL for Prod stage for Increment Views function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/increment/"
+    Value: !Sub "https://${IncrementViewsApiDeployment}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/increment/"
   IncrementViewsFunction:
     Description: "Increment Views Lambda Function ARN"
     Value: !GetAtt IncrementViewsFunction.Arn

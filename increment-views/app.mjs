@@ -37,7 +37,6 @@ const command = new UpdateCommand(params);
 export const lambdaHandler = async (event, context) => {
     try {
         const response = await docClient.send(command);
-        console.log(response);
         return {
             'statusCode': 200,
             'body': JSON.stringify({

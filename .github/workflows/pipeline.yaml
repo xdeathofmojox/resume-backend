@@ -14,6 +14,7 @@ env:
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
   TESTING_STACK_NAME: resume-backend-dev
+  TESTING_STAGE_NAME: dev
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-resume-b-PipelineExecutionRole-1RZPP2K3PPDL9
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-resum-CloudFormationExecutionR-1OV5OU7ISWJ93
   TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-resume-backen-artifactsbucket-1k4b1su5e2awi
@@ -23,6 +24,7 @@ env:
   # TESTING_IMAGE_REPOSITORY = '0123456789.dkr.ecr.region.amazonaws.com/repository-name'
   TESTING_REGION: us-east-1
   PROD_STACK_NAME: resume-backend-prod
+  PROD_STAGE_NAME: prod
   PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-resume-b-PipelineExecutionRole-11IGRLQ87IQ76
   PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-resum-CloudFormationExecutionR-1XGYC2902A42J
   PROD_ARTIFACTS_BUCKET: aws-sam-cli-managed-resume-backen-artifactsbucket-wv7l7gpitc3b
@@ -104,7 +106,8 @@ jobs:
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
-            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides ParameterKey=Stage,ParameterValue=${{ env.TESTING_STAGE_NAME }}
 
   build-and-package:
     if: github.ref == 'refs/heads/main'
@@ -197,7 +200,8 @@ jobs:
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
-            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides ParameterKey=Stage,ParameterValue=${{ env.TESTING_STAGE_NAME }}
 
   integration-test:
     if: github.ref == 'refs/heads/main'
@@ -243,4 +247,5 @@ jobs:
             --region ${PROD_REGION} \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
-            --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides ParameterKey=Stage,ParameterValue=${{ env.PROD_STAGE_NAME }}
